@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
+import { UsersComponent } from './users/users.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  standalone: true,
+  imports: [UsersComponent],
+  template: '<app-users></app-users>',
 })
-export class AppComponent {
-  title = 'onboarding-app';
-}
+export class AppComponent {}
