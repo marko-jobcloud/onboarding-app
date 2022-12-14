@@ -4,6 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
 import { UsersService } from './users.service';
 import { User } from './user.model';
+import { UsersStore } from './users.store';
 
 @Component({
   selector: 'app-users',
@@ -31,6 +32,7 @@ import { User } from './user.model';
     </div>
   `,
   styles: ['.active { background-color: aqua; }'],
+  providers: [UsersStore],
 })
 export class UsersComponent implements OnInit {
   private readonly usersService = inject(UsersService);
