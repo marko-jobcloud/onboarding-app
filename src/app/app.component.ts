@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { UsersComponent } from './users/users.component';
 
 @Component({
@@ -6,5 +6,6 @@ import { UsersComponent } from './users/users.component';
   standalone: true,
   imports: [UsersComponent],
   template: '<app-users></app-users>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {}
