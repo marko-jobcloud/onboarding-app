@@ -18,50 +18,35 @@ import { UserListComponent } from './components/user-list.component';
 
     <app-search-box (searchEvent)="onSearchChange($event)"></app-search-box>
 
-    <app-user-list [filteredUsers$]="filteredUsers$"></app-user-list>
+    <app-user-list [users]="filteredUsers$ | async"></app-user-list>
 
     <app-paginator
-      [currentPage]="selectedPageSize$.value"
-      (pageChangeEvent)="onUpdateSelectedPageSize($event)">
+      [selectedPageSize]="userStore.selectedPageSize$ | async"
+      (pageSizeChange)="onUpdateSelectedPageSize($event)">
     </app-paginator>
   `,
-  // styles: ['.active { background-color: aqua; }'],
   providers: [UsersStore],
 })
-export class UsersComponent implements OnInit {
-  private readonly usersService = inject(UsersService);
-
-  // readonly pageSizes = [1, 3, 5, 10];
-  readonly queryControl = new FormControl('', { nonNullable: true });
-
-  readonly allUsers$ = new BehaviorSubject<User[]>([]);
-  readonly selectedPageSize$ = new BehaviorSubject(5);
-  // readonly query$ = this.queryControl.valueChanges.pipe(
-  //   startWith(this.queryControl.value),
-  //   map((query) => query.trim().toLowerCase())
-  // );
-  readonly query$ = new BehaviorSubject('');
+export class UsersComponent {
+  readonly userStore = inject(UsersStore)
 
   readonly filteredUsers$ = combineLatest({
-    allUsers: this.allUsers$,
-    selectedPageSize: this.selectedPageSize$,
-    query: this.query$,
+    allUsers: this.userStore.allUsers$,
+    selectedPageSize: this.userStore.selectedPageSize$,
+    query: this.userStore.query$,
   }).pipe(
     map(({ allUsers, selectedPageSize, query }) =>
       filterUsers(allUsers, query, selectedPageSize)
     )
   );
 
-  ngOnInit(): void {
-    this.usersService.getAll().subscribe(this.allUsers$);
-  }
 
   onUpdateSelectedPageSize(pageSize: number): void {
-    this.selectedPageSize$.next(pageSize);
+    this.userStore.patchState({ selectedPageSize: pageSize })
   }
 
   onSearchChange(query: string): void {
-    this.query$.next(query);
+    this.userStore.patchState({ query })
   }
 }
 

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
     selector: 'app-paginator',
@@ -9,8 +9,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
         <div>
             <button
                 *ngFor="let pageSize of pageSizes"
-                [class.active]="pageSize === currentPage"
-                (click)="pageChange(pageSize)"
+                [class.active]="pageSize === selectedPageSize"
+                (click)="onPageSizeChange(pageSize)"
             >
                 {{ pageSize }}
             </button>
@@ -18,18 +18,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
     `,
     styles: ['.active { background-color: pink; }']
 })
-export class PaginatorComponent implements OnInit {
+export class PaginatorComponent {
 
     readonly pageSizes = [1, 3, 5, 10]
 
-    @Input() currentPage: any;
-    @Output() pageChangeEvent = new EventEmitter<number>();
+    @Input() selectedPageSize!: number | null;
+    @Output() pageSizeChange = new EventEmitter<number>();
 
-    ngOnInit(): void {
-    }
-
-    pageChange(page: number): void {
-        this.currentPage = page;
-        this.pageChangeEvent.emit(this.currentPage)
+    onPageSizeChange(page: number): void {
+        this.pageSizeChange.emit(page)
     }
 }

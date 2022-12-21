@@ -9,17 +9,14 @@ import { User } from "../user.model";
     imports: [CommonModule],
     template: `
         <ul>
-            <li *ngFor="let user of (filteredUsers$ | async)">
+            <li *ngFor="let user of users">
                 {{ user.firstName + ' ' + user.lastName }}
             </li>
         </ul>
     `,
 })
-export class UserListComponent implements OnInit {
+export class UserListComponent {
 
-    @Input() filteredUsers$: Observable<User[]> | undefined;
-
-    ngOnInit(): void {
-    }
+    @Input() users: User[] | null = [];
 
 }
