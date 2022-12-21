@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { exhaustMap, tap } from 'rxjs';
+import { pipe, switchMap, tap } from 'rxjs';
 import { ComponentStore } from '@ngrx/component-store';
 import { User } from './user.model';
 import { UsersService } from './users.service';
@@ -20,43 +20,40 @@ const initialState: State = {
 export class UsersStore extends ComponentStore<State> {
   private readonly usersService = inject(UsersService);
 
-  readonly allUsers$ = this.select((state) => state.users);
-  readonly selectedPageSize$ = this.select((state) => state.selectedPageSize);
-  readonly query$ = this.select((state) => state.query);
-
-  readonly filteredUsers$ = this.select(
-    this.allUsers$,
-    this.selectedPageSize$,
-    this.query$,
-    (allUsers, selectedPageSize, query) =>
-      filterUsers(allUsers, query, selectedPageSize)
+  // local state selectors
+  private readonly users$ = this.select((state) => state.users);
+  private readonly selectedPageSize$ = this.select(
+    (state) => state.selectedPageSize
   );
+  private readonly query$ = this.select((state) => state.query);
 
+  // derived selectors
+  private readonly loadUsersParams$ = this.select({
+    query: this.query$,
+    pageSize: this.selectedPageSize$,
+  });
+
+  // view model selector
   readonly vm$ = this.select({
     query: this.query$,
     selectedPageSize: this.selectedPageSize$,
-    filteredUsers: this.filteredUsers$,
+    users: this.users$,
   });
 
-  readonly loadAllUsers = this.effect(($) => {
-    return $.pipe(
-      exhaustMap(() => this.usersService.getAll()),
+  // effects
+  readonly loadUsers = this.effect<{ query: string; pageSize: number }>(
+    pipe(
+      switchMap(({ query, pageSize }) =>
+        this.usersService.getUsers(query, pageSize)
+      ),
       tap((users) => this.patchState({ users }))
-    );
-  });
+    )
+  );
 
   constructor() {
     super(initialState);
-    this.loadAllUsers();
-  }
-}
 
-function filterUsers(
-  allUsers: User[],
-  query: string,
-  pageSize: number
-): User[] {
-  return allUsers
-    .filter(({ firstName }) => firstName.toLowerCase().includes(query))
-    .slice(0, pageSize);
+    // re-fetch users every time when query or selectedPageSize changes
+    this.loadUsers(this.loadUsersParams$);
+  }
 }

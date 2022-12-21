@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LetModule } from '@ngrx/component';
 import { UsersStore } from './users.store';
 import { PaginatorComponent } from '../shared/paginator.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
 import { UserListComponent } from './components/user-list.component';
-import { LetModule } from '@ngrx/component';
 
 @Component({
   selector: 'app-users',
@@ -25,7 +25,7 @@ import { LetModule } from '@ngrx/component';
         (queryChange)="onUpdateQuery($event)"
       ></app-search-box>
 
-      <app-user-list [users]="vm.filteredUsers"></app-user-list>
+      <app-user-list [users]="vm.users"></app-user-list>
 
       <app-paginator
         [selectedPageSize]="vm.selectedPageSize"

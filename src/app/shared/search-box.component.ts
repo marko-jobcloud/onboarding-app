@@ -5,7 +5,7 @@ import {
   Output,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { distinctUntilChanged, map } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-search-box',
@@ -23,6 +23,7 @@ export class SearchBoxComponent {
   }
 
   @Output() queryChange = this.queryControl.valueChanges.pipe(
+    debounceTime(300),
     map((query) => query.trim().toLowerCase()),
     distinctUntilChanged()
   );
