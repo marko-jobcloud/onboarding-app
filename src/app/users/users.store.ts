@@ -1,8 +1,8 @@
-import { User } from './user.model';
-import { BaseStore, select } from '../shared/base-store';
-import { UsersService } from './users.service';
 import { inject, Injectable } from '@angular/core';
-import { combineLatest, map } from 'rxjs';
+import { exhaustMap, tap } from 'rxjs';
+import { ComponentStore } from '@ngrx/component-store';
+import { User } from './user.model';
+import { UsersService } from './users.service';
 
 interface State {
   users: User[];
@@ -17,31 +17,37 @@ const initialState: State = {
 };
 
 @Injectable()
-export class UsersStore extends BaseStore<State> {
+export class UsersStore extends ComponentStore<State> {
   private readonly usersService = inject(UsersService);
 
-  readonly allUsers$ = this.state$.pipe(select((state) => state.users));
-  readonly selectedPageSize$ = this.state$.pipe(
-    select((state) => state.selectedPageSize)
-  );
-  readonly query$ = this.state$.pipe(select((state) => state.query));
+  readonly allUsers$ = this.select((state) => state.users);
+  readonly selectedPageSize$ = this.select((state) => state.selectedPageSize);
+  readonly query$ = this.select((state) => state.query);
 
-  readonly filteredUsers$ = combineLatest({
-    allUsers: this.allUsers$,
-    selectedPageSize: this.selectedPageSize$,
-    query: this.query$,
-  }).pipe(
-    map(({ allUsers, selectedPageSize, query }) =>
+  readonly filteredUsers$ = this.select(
+    this.allUsers$,
+    this.selectedPageSize$,
+    this.query$,
+    (allUsers, selectedPageSize, query) =>
       filterUsers(allUsers, query, selectedPageSize)
-    )
   );
+
+  readonly vm$ = this.select({
+    query: this.query$,
+    selectedPageSize: this.selectedPageSize$,
+    filteredUsers: this.filteredUsers$,
+  });
+
+  readonly loadAllUsers = this.effect(($) => {
+    return $.pipe(
+      exhaustMap(() => this.usersService.getAll()),
+      tap((users) => this.patchState({ users }))
+    );
+  });
 
   constructor() {
     super(initialState);
-
-    this.usersService.getAll().subscribe((users) => {
-      this.patchState({ users });
-    });
+    this.loadAllUsers();
   }
 }
 

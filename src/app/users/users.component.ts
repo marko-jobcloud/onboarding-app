@@ -4,6 +4,7 @@ import { UsersStore } from './users.store';
 import { PaginatorComponent } from '../shared/paginator.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
 import { UserListComponent } from './components/user-list.component';
+import { LetModule } from '@ngrx/component';
 
 @Component({
   selector: 'app-users',
@@ -13,21 +14,24 @@ import { UserListComponent } from './components/user-list.component';
     PaginatorComponent,
     SearchBoxComponent,
     UserListComponent,
+    LetModule,
   ],
   template: `
     <h1>Users</h1>
 
-    <app-search-box
-      [query]="(query$ | async)!"
-      (queryChange)="onUpdateQuery($event)"
-    ></app-search-box>
+    <ng-container *ngrxLet="vm$ as vm">
+      <app-search-box
+        [query]="vm.query"
+        (queryChange)="onUpdateQuery($event)"
+      ></app-search-box>
 
-    <app-user-list [users]="(filteredUsers$ | async)!"></app-user-list>
+      <app-user-list [users]="vm.filteredUsers"></app-user-list>
 
-    <app-paginator
-      [selectedPageSize]="(selectedPageSize$ | async)!"
-      (selectedPageSizeChange)="onUpdateSelectedPageSize($event)"
-    ></app-paginator>
+      <app-paginator
+        [selectedPageSize]="vm.selectedPageSize"
+        (selectedPageSizeChange)="onUpdateSelectedPageSize($event)"
+      ></app-paginator>
+    </ng-container>
   `,
   providers: [UsersStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,9 +39,7 @@ import { UserListComponent } from './components/user-list.component';
 export class UsersComponent {
   private readonly usersStore = inject(UsersStore);
 
-  readonly query$ = this.usersStore.query$;
-  readonly selectedPageSize$ = this.usersStore.selectedPageSize$;
-  readonly filteredUsers$ = this.usersStore.filteredUsers$;
+  readonly vm$ = this.usersStore.vm$;
 
   onUpdateSelectedPageSize(selectedPageSize: number): void {
     this.usersStore.patchState({ selectedPageSize });
