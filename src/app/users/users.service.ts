@@ -14,4 +14,13 @@ export class UsersService {
       params: { q: query, _limit: pageSize },
     });
   }
+
+  createUser(user: Omit<User, 'id'>): Observable<User> {
+    let data = JSON.stringify(user)
+    return this.http.post<User>(USERS_API_URL, data, {'headers': {'Content-Type':'application/json'}})
+  }
+
+  updateUser(user: User): Observable<User> {
+    return this.http.put<User>(`${USERS_API_URL}/${user.id}`, user);
+  }
 }

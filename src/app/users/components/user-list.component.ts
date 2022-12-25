@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../user.model';
 
@@ -8,13 +8,21 @@ import { User } from '../user.model';
   imports: [CommonModule],
   template: `
     <ul>
-      <li *ngFor="let user of users">
-        {{ user.firstName + ' ' + user.lastName }}
+      <li *ngFor="let user of users" (click)="selectUser.emit(user.id)"
+        [ngClass]="{'selected': selectedUserId && user.id === selectedUserId}">
+          {{ user.firstName + ' ' + user.lastName }}
       </li>
     </ul>
   `,
+  styles: [
+    'li { cursor: pointer }',
+    '.selected { color: green }'
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserListComponent {
   @Input() users: User[] = [];
+  @Input() selectedUserId: number | null = null;
+
+  @Output() selectUser = new EventEmitter<number>();
 }

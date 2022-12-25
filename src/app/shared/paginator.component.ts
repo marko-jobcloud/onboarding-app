@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginatorComponent {
-  readonly pageSizes = [1, 3, 5, 10];
+  readonly pageSizes = [1, 3, 5, 10, 15];
 
   @Input() selectedPageSize = 5;
   @Output() selectedPageSizeChange = new EventEmitter<number>();
