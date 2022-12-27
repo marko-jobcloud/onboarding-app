@@ -82,11 +82,6 @@ export class UsersComponent {
   }
 
   onUpdateUser(user: Omit<User, 'id'>): void {
-    this.vm$
-      .pipe(take(1))
-      .subscribe(vm => {
-        let data: User = { id: vm.selectedUserId!, ...user }
-        this.usersStore.updateUser(data)
-      })
+    this.usersStore.updateUser(user);
   }
 }

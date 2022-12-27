@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { exhaustMap, pipe, switchMap, take, tap } from 'rxjs';
+import { exhaustMap, pipe, switchMap, take, tap, withLatestFrom } from 'rxjs';
 import { ComponentStore } from '@ngrx/component-store';
 import { User } from './user.model';
 import { UsersService } from './users.service';
@@ -87,10 +87,11 @@ export class UsersStore extends ComponentStore<State> {
     )
   )
 
-  readonly updateUser = this.effect<User>(
+  readonly updateUser = this.effect<Omit<User, 'id'>>(
     pipe(
       tap(() => this.patchState({ isDisabledUpdateButton: true })),
-      exhaustMap((user) => this.usersService.updateUser(user)),
+      withLatestFrom(this.selectedUserId$),
+      exhaustMap(([user, selectedUserId]) => this.usersService.updateUser({id: selectedUserId!, ...user})),
       tap(() => {
         this.patchState({ isDisabledUpdateButton: false });
         this.loadUsers(this.loadUsersParams$.pipe(take(1)));

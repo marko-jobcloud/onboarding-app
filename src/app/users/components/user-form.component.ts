@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from "@angular/core";
-import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ReactiveFormsModule, Validators, NonNullableFormBuilder } from "@angular/forms";
 import { User } from "../user.model";
 
 @Component({
@@ -17,21 +17,25 @@ import { User } from "../user.model";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserFormComponent {
-    private readonly formBuilder = inject(FormBuilder)
+    private readonly formBuilder = inject(NonNullableFormBuilder)
 
     readonly form = this.formBuilder.group({
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]]
     })
 
-    @Input() set user(user: User | null) {
-        this.form.setValue(user ? { firstName: user.firstName, lastName: user.lastName } : { firstName: '', lastName: '' })
+    @Input() set user(user: Omit<User, 'id'> | null) {
+        if (user) {
+            this.form.setValue(user)
+        } else {
+            this.form.reset()
+        }
     }
-    @Input() isDisabled!: boolean;
+    @Input() isDisabled = false;
 
-    @Output() save = new EventEmitter();
+    @Output() save = new EventEmitter<Omit<User, 'id'>>();
 
     onSave() {
-        this.save.emit(this.form.value);
+        this.save.emit(this.form.getRawValue());
     }
 }
