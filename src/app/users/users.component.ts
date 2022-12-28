@@ -1,12 +1,28 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { createSelector, Store } from '@ngrx/store';
 import { LetModule } from '@ngrx/component';
-import { UsersStore } from './users.store';
 import { User } from './user.model';
 import { PaginatorComponent } from '../shared/paginator.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
 import { UserListComponent } from './components/user-list.component';
 import { UserFormComponent } from './components/user-form.component';
+import { usersPageActions } from './actions/users-page.actions';
+import {
+  selectIsCreating,
+  selectIsLoading,
+  selectIsUpdating,
+  selectQuery,
+  selectSelectedPageSize,
+  selectSelectedUser,
+  selectSelectedUserId,
+  selectUsers,
+} from './state/users.selectors';
 
 @Component({
   selector: 'app-users',
@@ -54,31 +70,47 @@ import { UserFormComponent } from './components/user-form.component';
       ></app-user-form>
     </ng-container>
   `,
-  providers: [UsersStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersComponent {
-  private readonly usersStore = inject(UsersStore);
+export class UsersComponent implements OnInit {
+  private readonly store = inject(Store);
 
-  readonly vm$ = this.usersStore.vm$;
+  readonly vm$ = this.store.select(selectUsersPageViewModel);
+
+  ngOnInit(): void {
+    this.store.dispatch(usersPageActions.opened());
+  }
 
   onUpdateSelectedPageSize(selectedPageSize: number): void {
-    this.usersStore.patchState({ selectedPageSize });
+    this.store.dispatch(usersPageActions.pageSizeChanged({ selectedPageSize }));
   }
 
   onUpdateQuery(query: string): void {
-    this.usersStore.patchState({ query });
+    this.store.dispatch(usersPageActions.queryChanged({ query }));
   }
 
   onUpdateSelectedUserId(selectedUserId: number): void {
-    this.usersStore.patchState({ selectedUserId });
+    this.store.dispatch(
+      usersPageActions.selectedUserChanged({ selectedUserId })
+    );
   }
 
   onCreateUser(user: Omit<User, 'id'>): void {
-    this.usersStore.createUser(user);
+    // this.usersStore.createUser(user);
   }
 
   onUpdateUser(user: Omit<User, 'id'>): void {
-    this.usersStore.updateUser(user);
+    // this.usersStore.updateUser(user);
   }
 }
+
+const selectUsersPageViewModel = createSelector({
+  users: selectUsers,
+  query: selectQuery,
+  selectedUserId: selectSelectedUserId,
+  selectedUser: selectSelectedUser,
+  selectedPageSize: selectSelectedPageSize,
+  isLoading: selectIsLoading,
+  isCreating: selectIsCreating,
+  isUpdating: selectIsUpdating,
+});
