@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -28,6 +34,7 @@ import { User } from '../user.model';
       </button>
     </form>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserFormComponent {
   readonly userForm = new FormGroup({
