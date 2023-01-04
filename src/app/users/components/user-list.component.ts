@@ -1,23 +1,18 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../user.model';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <ul>
       <li
         *ngFor="let user of users"
-        [class.active]="user.id === selectedUserId"
-        (click)="selectedUserIdChange.emit(user.id)"
+        routerLink="/update-user"
+        [queryParams]="{ id: user.id }"
       >
         {{ user.firstName + ' ' + user.lastName }}
       </li>
@@ -27,10 +22,9 @@ import { User } from '../user.model';
     `
       li {
         cursor: pointer;
-      }
-
-      .active {
-        background-color: aqua;
+        &:hover {
+          background-color: aqua;
+        }
       }
     `,
   ],
@@ -38,6 +32,4 @@ import { User } from '../user.model';
 })
 export class UserListComponent {
   @Input() users: User[] = [];
-  @Input() selectedUserId: number | null = null;
-  @Output() selectedUserIdChange = new EventEmitter<number>();
 }

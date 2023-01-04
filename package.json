@@ -23,6 +23,7 @@
     "@ngrx/component": "^15.0.0",
     "@ngrx/component-store": "^15.0.0",
     "@ngrx/effects": "^15.1.0",
+    "@ngrx/router-store": "^15.1.0",
     "@ngrx/store": "^15.1.0",
     "@ngrx/store-devtools": "^15.1.0",
     "rxjs": "~7.5.0",

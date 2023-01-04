@@ -2,6 +2,8 @@ import { User } from '../user.model';
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { usersPageActions } from '../actions/users-page.actions';
 import { usersApiActions } from '../actions/users-api.actions';
+import { createUserActions } from '../actions/create-users-page.action';
+import { updateUserAction } from '../actions/update-user-page.action';
 
 interface State {
   users: User[];
@@ -36,10 +38,6 @@ const reducer = createReducer(
     selectedPageSize,
     isLoading: true,
   })),
-  on(usersPageActions.selectedUserChanged, (state, { selectedUserId }) => ({
-    ...state,
-    selectedUserId,
-  })),
   on(usersApiActions.usersLoadedSuccess, (state, { users }) => ({
     ...state,
     users,
@@ -48,6 +46,41 @@ const reducer = createReducer(
   on(usersApiActions.usersLoadedFailure, (state) => ({
     ...state,
     isLoading: false,
+  })),
+  on(createUserActions.saveUser, (state, { user }) => ({
+    ...state,
+    user,
+    isCreating: true,
+  })),
+  on(createUserActions.userSavedSuccess, (state) => ({
+    ...state,
+    isCreating: false,
+  })),
+  on(createUserActions.userSavedFail, (state) => ({
+    ...state,
+    isCreating: false,
+  })),
+  on(updateUserAction.opened, (state) => ({
+    ...state,
+    isLoading: true,
+  })),
+  on(updateUserAction.selectUser, (state, { selectedUserId }) => ({
+    ...state,
+    selectedUserId,
+    isLoading: false,
+  })),
+  on(updateUserAction.updateUser, (state, { user }) => ({
+    ...state,
+    user,
+    isUpdating: true,
+  })),
+  on(updateUserAction.userUpdateSuccess, (state) => ({
+    ...state,
+    isUpdating: false,
+  })),
+  on(updateUserAction.userUpdateFail, (state) => ({
+    ...state,
+    isUpdating: false,
   }))
 );
 
