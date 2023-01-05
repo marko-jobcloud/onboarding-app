@@ -96,11 +96,11 @@ export class UsersComponent implements OnInit {
   }
 
   onCreateUser(user: Omit<User, 'id'>): void {
-    // this.usersStore.createUser(user);
+    this.store.dispatch(usersPageActions.createUser({user}));
   }
 
   onUpdateUser(user: Omit<User, 'id'>): void {
-    // this.usersStore.updateUser(user);
+    this.store.dispatch(usersPageActions.updateUser({user}));
   }
 }
 

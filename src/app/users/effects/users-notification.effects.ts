@@ -10,8 +10,25 @@ export class UsersNotificationEffects {
   readonly displayFailureNotification$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(usersApiActions.usersLoadedFailure),
+        ofType(
+          usersApiActions.usersLoadedFailure,
+          usersApiActions.userCreatedFailure,
+          usersApiActions.userUpdatedFailure
+        ),
         tap(({ errorMsg }) => alert(errorMsg))
+      );
+    },
+    { dispatch: false }
+  );
+
+  readonly displaySuccessNotification$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(
+          usersApiActions.userCreatedSuccess,
+          usersApiActions.userUpdatedSuccess
+        ),
+        tap(({ msg }) => alert(msg))
       );
     },
     { dispatch: false }

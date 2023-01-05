@@ -48,7 +48,31 @@ const reducer = createReducer(
   on(usersApiActions.usersLoadedFailure, (state) => ({
     ...state,
     isLoading: false,
-  }))
+  })),
+  on(usersPageActions.createUser, (state) => ({
+    ...state,
+    isCreating: true
+  })),
+  on(usersPageActions.updateUser, (state) => ({
+    ...state,
+    isUpdating: true
+  })),
+  on(usersApiActions.userCreatedSuccess, (state) => ({
+    ...state,
+    isCreating: false,
+  })),
+  on(usersApiActions.userCreatedFailure, (state) => ({
+    ...state,
+    isCreating: false,
+  })),
+  on(usersApiActions.userUpdatedSuccess, (state) => ({
+    ...state,
+    isUpdating: false,
+  })),
+  on(usersApiActions.userUpdatedFailure, (state) => ({
+    ...state,
+    isUpdating: false,
+  })),
 );
 
 export const usersFeature = createFeature({ name: 'users', reducer });
