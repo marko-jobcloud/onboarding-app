@@ -2,6 +2,8 @@ import { User } from '../user.model';
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { usersPageActions } from '../actions/users-page.actions';
 import { usersApiActions } from '../actions/users-api.actions';
+import { UserCreateActions } from '../actions/user-create.actions';
+import { UserUpdateActions } from '../actions/user-update.actions';
 
 interface State {
   users: User[];
@@ -49,11 +51,11 @@ const reducer = createReducer(
     ...state,
     isLoading: false,
   })),
-  on(usersPageActions.createUser, (state) => ({
+  on(UserCreateActions.createUser, (state) => ({
     ...state,
     isCreating: true
   })),
-  on(usersPageActions.updateUser, (state) => ({
+  on(UserUpdateActions.updateUser, (state) => ({
     ...state,
     isUpdating: true
   })),

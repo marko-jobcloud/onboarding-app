@@ -8,6 +8,9 @@ import { AppComponent } from './app/app.component';
 import { usersFeature } from './app/users/state/users.reducer';
 import { UsersApiEffects } from './app/users/effects/users-api.effects';
 import { UsersNotificationEffects } from './app/users/effects/users-notification.effects';
+import { provideRouter } from '@angular/router';
+import { provideRouterStore } from '@ngrx/router-store'
+import { appRoutes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -15,5 +18,7 @@ bootstrapApplication(AppComponent, {
     provideStore({ [usersFeature.name]: usersFeature.reducer }),
     provideStoreDevtools({ logOnly: !isDevMode() }),
     provideEffects(UsersApiEffects, UsersNotificationEffects),
+    provideRouter(appRoutes),
+    provideRouterStore()
   ],
 });

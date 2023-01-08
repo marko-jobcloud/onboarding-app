@@ -8,6 +8,8 @@ import { usersPageActions } from '../actions/users-page.actions';
 import { usersApiActions } from '../actions/users-api.actions';
 import { selectQuery, selectSelectedPageSize, selectSelectedUserId } from '../state/users.selectors';
 import { User } from '../user.model';
+import { UserCreateActions } from '../actions/user-create.actions';
+import { UserUpdateActions } from '../actions/user-update.actions';
 
 @Injectable()
 export class UsersApiEffects {
@@ -39,7 +41,7 @@ export class UsersApiEffects {
 
   readonly createUser$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(usersPageActions.createUser),
+      ofType(UserCreateActions.createUser),
       exhaustMap(({user}) => {
         return this.usersService.createUser(user).pipe(
           map(() => usersApiActions.userCreatedSuccess({ msg: 'Successfully created' })),
@@ -53,7 +55,7 @@ export class UsersApiEffects {
 
   readonly updateUser$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(usersPageActions.updateUser),
+      ofType(UserUpdateActions.updateUser),
       concatLatestFrom(() => [
         this.store.select(selectSelectedUserId)
       ]),

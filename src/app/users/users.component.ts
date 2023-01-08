@@ -35,82 +35,9 @@ import {
     UserListComponent,
     UserFormComponent,
   ],
-  template: `
-    <h1>Users</h1>
-
-    <ng-container *ngrxLet="vm$ as vm">
-      <app-search-box
-        [query]="vm.query"
-        (queryChange)="onUpdateQuery($event)"
-      ></app-search-box>
-      <span *ngIf="vm.isLoading">Loading...</span>
-
-      <app-user-list
-        [users]="vm.users"
-        [selectedUserId]="vm.selectedUserId"
-        (selectedUserIdChange)="onUpdateSelectedUserId($event)"
-      ></app-user-list>
-
-      <app-paginator
-        [selectedPageSize]="vm.selectedPageSize"
-        (selectedPageSizeChange)="onUpdateSelectedPageSize($event)"
-      ></app-paginator>
-
-      <h2>Create User:</h2>
-      <app-user-form
-        [isSaving]="vm.isCreating"
-        (save)="onCreateUser($event)"
-      ></app-user-form>
-
-      <h2>Update User:</h2>
-      <app-user-form
-        [user]="vm.selectedUser"
-        [isSaving]="vm.isUpdating"
-        (save)="onUpdateUser($event)"
-      ></app-user-form>
-    </ng-container>
-  `,
+  template: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersComponent implements OnInit {
-  private readonly store = inject(Store);
-
-  readonly vm$ = this.store.select(selectUsersPageViewModel);
-
-  ngOnInit(): void {
-    this.store.dispatch(usersPageActions.opened());
-  }
-
-  onUpdateSelectedPageSize(selectedPageSize: number): void {
-    this.store.dispatch(usersPageActions.pageSizeChanged({ selectedPageSize }));
-  }
-
-  onUpdateQuery(query: string): void {
-    this.store.dispatch(usersPageActions.queryChanged({ query }));
-  }
-
-  onUpdateSelectedUserId(selectedUserId: number): void {
-    this.store.dispatch(
-      usersPageActions.selectedUserChanged({ selectedUserId })
-    );
-  }
-
-  onCreateUser(user: Omit<User, 'id'>): void {
-    this.store.dispatch(usersPageActions.createUser({user}));
-  }
-
-  onUpdateUser(user: Omit<User, 'id'>): void {
-    this.store.dispatch(usersPageActions.updateUser({user}));
-  }
+export class UsersComponent {
+  
 }
-
-const selectUsersPageViewModel = createSelector({
-  users: selectUsers,
-  query: selectQuery,
-  selectedUserId: selectSelectedUserId,
-  selectedUser: selectSelectedUser,
-  selectedPageSize: selectSelectedPageSize,
-  isLoading: selectIsLoading,
-  isCreating: selectIsCreating,
-  isUpdating: selectIsUpdating,
-});
