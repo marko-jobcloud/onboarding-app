@@ -7,11 +7,32 @@ import { usersApiActions } from '../actions/users-api.actions';
 export class UsersNotificationEffects {
   private readonly actions$ = inject(Actions);
 
-  readonly displayFailureNotification$ = createEffect(
+  readonly displayErrorNotification$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(usersApiActions.usersLoadedFailure),
-        tap(({ errorMsg }) => alert(errorMsg))
+        ofType(
+          usersApiActions.usersLoadedFailure,
+          usersApiActions.userCreatedFailure,
+          usersApiActions.userUpdatedFailure
+        ),
+        tap(({ error }) => alert(error))
+      );
+    },
+    { dispatch: false }
+  );
+
+  readonly displaySuccessNotification$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(
+          usersApiActions.userCreatedSuccess,
+          usersApiActions.userUpdatedSuccess
+        ),
+        tap(({ user }) =>
+          alert(
+            `User ${user.firstName} ${user.lastName} is saved successfully!`
+          )
+        )
       );
     },
     { dispatch: false }

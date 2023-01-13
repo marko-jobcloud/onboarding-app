@@ -1,54 +1,94 @@
-import { User } from '../user.model';
 import { createFeature, createReducer, on } from '@ngrx/store';
+import { createEntityAdapter, EntityState } from '@ngrx/entity';
+import { CallState } from '../../shared/state/call-state';
+import { User } from '../user.model';
 import { usersPageActions } from '../actions/users-page.actions';
 import { usersApiActions } from '../actions/users-api.actions';
+import { updateUserPageActions } from '../actions/update-user-page.actions';
+import { createUserPageActions } from '../actions/create-user-page.actions';
 
-interface State {
-  users: User[];
-  selectedUserId: number | null;
+interface State extends EntityState<User> {
+  filteredIds: number[];
   selectedPageSize: number;
   query: string;
-  isLoading: boolean;
-  isCreating: boolean;
-  isUpdating: boolean;
+  loadCallState: CallState;
+  createCallState: CallState;
+  updateCallState: CallState;
 }
 
-const initialState: State = {
-  users: [],
-  selectedUserId: null,
+const adapter = createEntityAdapter<User>();
+
+const initialState: State = adapter.getInitialState({
+  filteredIds: [],
   selectedPageSize: 5,
   query: '',
-  isLoading: false,
-  isCreating: false,
-  isUpdating: false,
-};
+  loadCallState: 'init',
+  createCallState: 'init',
+  updateCallState: 'init',
+});
 
 const reducer = createReducer(
   initialState,
-  on(usersPageActions.opened, (state) => ({ ...state, isLoading: true })),
+  on(usersPageActions.opened, (state) => ({
+    ...state,
+    loadCallState: 'pending',
+  })),
   on(usersPageActions.queryChanged, (state, { query }) => ({
     ...state,
     query,
-    isLoading: true,
+    loadCallState: 'pending',
   })),
   on(usersPageActions.pageSizeChanged, (state, { selectedPageSize }) => ({
     ...state,
     selectedPageSize,
-    isLoading: true,
+    loadCallState: 'pending',
   })),
-  on(usersPageActions.selectedUserChanged, (state, { selectedUserId }) => ({
+  on(createUserPageActions.userFormSubmitted, (state) => ({
     ...state,
-    selectedUserId,
+    createCallState: 'pending',
   })),
-  on(usersApiActions.usersLoadedSuccess, (state, { users }) => ({
+  on(updateUserPageActions.userFormSubmitted, (state) => ({
     ...state,
-    users,
-    isLoading: false,
+    updateCallState: 'pending',
   })),
-  on(usersApiActions.usersLoadedFailure, (state) => ({
+  on(usersApiActions.usersLoadedSuccess, (state, { users }) =>
+    adapter.setMany(users, {
+      ...state,
+      filteredIds: users.map(({ id }) => id),
+      loadCallState: 'fulfilled',
+    })
+  ),
+  on(usersApiActions.usersLoadedFailure, (state, { error }) => ({
     ...state,
-    isLoading: false,
+    filteredIds: [],
+    loadCallState: { error },
+  })),
+  on(usersApiActions.userLoadedSuccess, (state, { user }) =>
+    adapter.setOne(user, state)
+  ),
+  on(usersApiActions.userCreatedSuccess, (state, { user }) =>
+    adapter.addOne(user, {
+      ...state,
+      createCallState: 'fulfilled',
+    })
+  ),
+  on(usersApiActions.userCreatedFailure, (state, { error }) => ({
+    ...state,
+    createCallState: { error },
+  })),
+  on(usersApiActions.userUpdatedSuccess, (state, { user }) =>
+    adapter.setOne(user, {
+      ...state,
+      updateCallState: 'fulfilled',
+    })
+  ),
+  on(usersApiActions.userUpdatedFailure, (state, { error }) => ({
+    ...state,
+    updateCallState: { error },
   }))
 );
 
-export const usersFeature = createFeature({ name: 'users', reducer });
+const feature = createFeature({ name: 'users', reducer });
+const entitySelectors = adapter.getSelectors(feature.selectUsersState);
+
+export const usersFeature = { ...feature, ...entitySelectors };

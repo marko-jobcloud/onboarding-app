@@ -1,19 +1,19 @@
 import { isDevMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
+import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { provideEffects } from '@ngrx/effects';
 import { AppComponent } from './app/app.component';
-import { usersFeature } from './app/users/state/users.reducer';
-import { UsersApiEffects } from './app/users/effects/users-api.effects';
-import { UsersNotificationEffects } from './app/users/effects/users-notification.effects';
+import { appRoutes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideRouter(appRoutes),
     provideHttpClient(),
-    provideStore({ [usersFeature.name]: usersFeature.reducer }),
+    provideStore({ router: routerReducer }),
+    provideRouterStore(),
     provideStoreDevtools({ logOnly: !isDevMode() }),
-    provideEffects(UsersApiEffects, UsersNotificationEffects),
   ],
 });

@@ -9,17 +9,21 @@ const USERS_API_URL = 'http://localhost:3000/users';
 export class UsersService {
   private readonly http = inject(HttpClient);
 
-  getUsers(query: string, pageSize: number): Observable<User[]> {
+  getByFilter(filter: { query: string; pageSize: number }): Observable<User[]> {
     return this.http.get<User[]>(USERS_API_URL, {
-      params: { q: query, _limit: pageSize },
+      params: { q: filter.query, _limit: filter.pageSize },
     });
   }
 
-  createUser(user: Omit<User, 'id'>): Observable<User> {
+  getById(id: number): Observable<User> {
+    return this.http.get<User>(`${USERS_API_URL}/${id}`);
+  }
+
+  create(user: Omit<User, 'id'>): Observable<User> {
     return this.http.post<User>(USERS_API_URL, user);
   }
 
-  updateUser(user: User): Observable<User> {
+  update(user: User): Observable<User> {
     return this.http.put<User>(`${USERS_API_URL}/${user.id}`, user);
   }
 }
