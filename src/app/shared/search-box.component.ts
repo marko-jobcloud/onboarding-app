@@ -10,11 +10,11 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 @Component({
   selector: 'app-search-box',
   standalone: true,
+  imports: [ReactiveFormsModule],
   template: `
     <input type="text" placeholder="Search..." [formControl]="queryControl" />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
 })
 export class SearchBoxComponent {
   readonly queryControl = new FormControl('', { nonNullable: true });

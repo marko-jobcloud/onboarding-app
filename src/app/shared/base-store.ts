@@ -1,4 +1,11 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  distinctUntilChanged,
+  map,
+  Observable,
+  OperatorFunction,
+  pipe,
+} from 'rxjs';
 
 export class BaseStore<T> {
   private readonly stateSubject: BehaviorSubject<T>;
@@ -9,11 +16,13 @@ export class BaseStore<T> {
     this.state$ = this.stateSubject.asObservable();
   }
 
-  setState(state: T): void {
-    this.stateSubject.next(state);
-  }
-
   patchState(partialState: Partial<T>): void {
     this.stateSubject.next({ ...this.stateSubject.value, ...partialState });
   }
+}
+
+export function select<Input, Result>(
+  selector: (input: Input) => Result
+): OperatorFunction<Input, Result> {
+  return pipe(map(selector), distinctUntilChanged());
 }

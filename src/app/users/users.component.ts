@@ -1,28 +1,14 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgFor } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
-import { UsersService } from './users.service';
-import { User } from './user.model';
 import { LetModule } from '@ngrx/component';
 import { UserListComponent } from './components/user-list.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
+import { UsersStore } from './users.store';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [
-    NgFor,
-    ReactiveFormsModule,
-    LetModule,
-    UserListComponent,
-    SearchBoxComponent,
-  ],
+  imports: [NgFor, LetModule, UserListComponent, SearchBoxComponent],
   template: `
     <h1>Users</h1>
 
@@ -52,38 +38,23 @@ import { SearchBoxComponent } from '../shared/search-box.component';
     </ng-container>
   `,
   styles: ['.active { background-color: aqua }'],
+  providers: [UsersStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersComponent implements OnInit {
-  private readonly usersService = inject(UsersService);
+export class UsersComponent {
+  private readonly usersStore = inject(UsersStore);
 
   readonly pageSizes = [1, 3, 5, 10];
 
-  readonly users$ = new BehaviorSubject<User[]>([]);
-  readonly selectedPageSize$ = new BehaviorSubject<number>(5);
-  readonly query$ = new BehaviorSubject<string>('');
+  readonly selectedPageSize$ = this.usersStore.selectedPageSize$;
+  readonly query$ = this.usersStore.query$;
+  readonly filteredUsers$ = this.usersStore.filteredUsers$;
 
-  readonly filteredUsers$ = combineLatest({
-    users: this.users$,
-    query: this.query$,
-    selectedPageSize: this.selectedPageSize$,
-  }).pipe(
-    map(({ users, query, selectedPageSize }) =>
-      users
-        .filter(({ firstName }) => firstName.toLowerCase().includes(query))
-        .slice(0, selectedPageSize)
-    )
-  );
-
-  ngOnInit(): void {
-    this.usersService.getAll().subscribe((users) => this.users$.next(users));
-  }
-
-  onUpdateSelectedPageSize(pageSize: number): void {
-    this.selectedPageSize$.next(pageSize);
+  onUpdateSelectedPageSize(selectedPageSize: number): void {
+    this.usersStore.patchState({ selectedPageSize });
   }
 
   onQueryChanged(query: string): void {
-    this.query$.next(query);
+    this.usersStore.patchState({ query });
   }
 }
