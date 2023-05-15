@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { LetModule } from '@ngrx/component';
 import { UserListComponent } from './components/user-list.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
@@ -8,23 +8,19 @@ import { UsersStore } from './users.store';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [NgFor, LetModule, UserListComponent, SearchBoxComponent],
+  imports: [NgFor, LetModule, UserListComponent, SearchBoxComponent, NgIf],
   template: `
     <h1>Users</h1>
 
-    <ng-container
-      *ngrxLet="{
-        filteredUsers: filteredUsers$,
-        selectedPageSize: selectedPageSize$,
-        query: query$
-      } as vm"
-    >
+    <ng-container *ngrxLet="vm$ as vm">
       <app-search-box
         [query]="vm.query"
         (queryChanged)="onQueryChanged($event)"
       ></app-search-box>
 
-      <app-user-list [users]="vm.filteredUsers"></app-user-list>
+      <app-user-list [users]="vm.users"></app-user-list>
+
+      <p *ngIf="vm.isLoading">Loading...</p>
 
       <div>
         <button
@@ -46,9 +42,7 @@ export class UsersComponent {
 
   readonly pageSizes = [1, 3, 5, 10];
 
-  readonly selectedPageSize$ = this.usersStore.selectedPageSize$;
-  readonly query$ = this.usersStore.query$;
-  readonly filteredUsers$ = this.usersStore.filteredUsers$;
+  readonly vm$ = this.usersStore.vm$;
 
   onUpdateSelectedPageSize(selectedPageSize: number): void {
     this.usersStore.patchState({ selectedPageSize });
