@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { LetModule } from '@ngrx/component';
+import { LetDirective } from '@ngrx/component';
 import { UserListComponent } from './components/user-list.component';
 import { SearchBoxComponent } from '../shared/search-box.component';
 import { UsersStore } from './users.store';
@@ -8,7 +8,7 @@ import { UsersStore } from './users.store';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [NgFor, LetModule, UserListComponent, SearchBoxComponent, NgIf],
+  imports: [NgFor, LetDirective, UserListComponent, SearchBoxComponent, NgIf],
   template: `
     <h1>Users</h1>
 
