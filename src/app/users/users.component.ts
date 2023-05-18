@@ -12,6 +12,8 @@ import { UsersStore } from './users.store';
   template: `
     <h1>Users</h1>
 
+    {{ rendered() }}
+
     <ng-container *ngrxLet="vm$ as vm">
       <app-search-box
         [query]="vm.query"
@@ -43,6 +45,11 @@ export class UsersComponent {
   readonly pageSizes = [1, 3, 5, 10];
 
   readonly vm$ = this.usersStore.vm$;
+
+  rendered() {
+    console.log('rendered');
+    return '';
+  }
 
   onUpdateSelectedPageSize(selectedPageSize: number): void {
     this.usersStore.patchState({ selectedPageSize });

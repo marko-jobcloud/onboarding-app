@@ -1,11 +1,17 @@
-import { Injectable } from '@angular/core';
-import { delay, Observable, of } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { User } from './user.model';
-import { usersMock } from './users.mock';
+
+const USERS_API_URL = 'http://localhost:3000/users';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  getAll(): Observable<User[]> {
-    return of(usersMock).pipe(delay(2000));
+  private readonly http = inject(HttpClient);
+
+  getByFilter(filter: { query: string; pageSize: number }): Observable<User[]> {
+    return this.http.get<User[]>(USERS_API_URL, {
+      params: { q: filter.query, _limit: filter.pageSize },
+    });
   }
 }

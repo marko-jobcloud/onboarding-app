@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { exhaustMap, tap } from 'rxjs';
+import { exhaustMap, switchMap, tap } from 'rxjs';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { User } from './user.model';
 import { UsersService } from './users.service';
@@ -27,43 +27,38 @@ export class UsersStore extends ComponentStore<UsersState> {
   private readonly selectedPageSize$ = this.select((s) => s.selectedPageSize);
   private readonly isLoading$ = this.select((s) => s.isLoading);
 
-  private readonly filteredUsers$ = this.select(
-    this.users$,
-    this.query$,
-    this.selectedPageSize$,
-    (users, query, selectedPageSize) =>
-      users
-        .filter(({ firstName }) => firstName.toLowerCase().includes(query))
-        .slice(0, selectedPageSize)
-  );
+  private readonly filter$ = this.select({
+    query: this.query$,
+    pageSize: this.selectedPageSize$,
+  });
 
   readonly vm$ = this.select({
-    users: this.filteredUsers$,
+    users: this.users$,
     query: this.query$,
     selectedPageSize: this.selectedPageSize$,
     isLoading: this.isLoading$,
-  });
+  }, { debounce: true });
 
   constructor() {
     super(initialState);
 
-    this.loadAllUsers();
+    this.loadUsersByFilter(this.filter$);
   }
 
-  readonly loadAllUsers = this.effect<void>((trigger$) => {
-    return trigger$.pipe(
-      tap(() => this.patchState({ isLoading: true })),
-      exhaustMap(() =>
-        this.usersService.getAll().pipe(
-          tapResponse(
-            (users) => this.patchState({ users, isLoading: false }),
-            (error) => {
-              console.error(error);
-              this.patchState({ isLoading: false });
-            }
+  readonly loadUsersByFilter = this.effect<{ query: string; pageSize: number }>(
+    (filter$) => {
+      return filter$.pipe(
+        tap(() => this.patchState({ isLoading: true })),
+        switchMap((filter) =>
+          this.usersService.getByFilter(filter).pipe(
+            tapResponse({
+              next: (users) => this.patchState({ users }),
+              error: console.error,
+              finalize: () => this.patchState({ isLoading: false }),
+            })
           )
         )
-      )
-    );
-  });
+      );
+    }
+  );
 }
