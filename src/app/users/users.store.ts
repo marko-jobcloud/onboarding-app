@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { exhaustMap, switchMap, tap } from 'rxjs';
+import { switchMap, tap } from 'rxjs';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { User } from './user.model';
 import { UsersService } from './users.service';
@@ -32,12 +32,15 @@ export class UsersStore extends ComponentStore<UsersState> {
     pageSize: this.selectedPageSize$,
   });
 
-  readonly vm$ = this.select({
-    users: this.users$,
-    query: this.query$,
-    selectedPageSize: this.selectedPageSize$,
-    isLoading: this.isLoading$,
-  }, { debounce: true });
+  readonly vm$ = this.select(
+    {
+      users: this.users$,
+      query: this.query$,
+      selectedPageSize: this.selectedPageSize$,
+      isLoading: this.isLoading$,
+    },
+    { debounce: true }
+  );
 
   constructor() {
     super(initialState);

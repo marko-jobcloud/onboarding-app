@@ -1,18 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { LetDirective } from '@ngrx/component';
-import { UserListComponent } from './components/user-list.component';
-import { SearchBoxComponent } from '../shared/search-box.component';
-import { UsersStore } from './users.store';
+import { UserListComponent } from '../components/user-list.component';
+import { SearchBoxComponent } from '../../shared/search-box.component';
+import { UsersStore } from '../users.store';
 
 @Component({
-  selector: 'app-users',
   standalone: true,
   imports: [NgFor, LetDirective, UserListComponent, SearchBoxComponent, NgIf],
   template: `
     <h1>Users</h1>
-
-    {{ rendered() }}
 
     <ng-container *ngrxLet="vm$ as vm">
       <app-search-box
@@ -35,21 +32,16 @@ import { UsersStore } from './users.store';
       </div>
     </ng-container>
   `,
-  styles: ['.active { background-color: aqua }'],
   providers: [UsersStore],
+  styles: ['.active { background-color: aqua }'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersComponent {
+export default class UsersComponent {
   private readonly usersStore = inject(UsersStore);
 
   readonly pageSizes = [1, 3, 5, 10];
 
   readonly vm$ = this.usersStore.vm$;
-
-  rendered() {
-    console.log('rendered');
-    return '';
-  }
 
   onUpdateSelectedPageSize(selectedPageSize: number): void {
     this.usersStore.patchState({ selectedPageSize });
