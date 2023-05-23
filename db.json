@@ -29,41 +29,6 @@
       "id": 6,
       "firstName": "Marsh",
       "lastName": "Mccall"
-    },
-    {
-      "firstName": "ana",
-      "lastName": "kljajic",
-      "id": 7
-    },
-    {
-      "firstName": "nikola",
-      "lastName": "bakic",
-      "id": 8
-    },
-    {
-      "firstName": "marko",
-      "lastName": "stanimirovic",
-      "id": 9
-    },
-    {
-      "firstName": "Ana",
-      "lastName": "Kljajic",
-      "id": 10
-    },
-    {
-      "firstName": "Ana",
-      "lastName": "Kljajic",
-      "id": 11
-    },
-    {
-      "firstName": "Patak",
-      "lastName": "Daca",
-      "id": 12
-    },
-    {
-      "firstName": "Test",
-      "lastName": "User",
-      "id": 13
     }
   ]
 }
