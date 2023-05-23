@@ -1,17 +1,29 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { User } from './user.model';
+import {inject, Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {User} from './user.model';
 
 const USERS_API_URL = 'http://localhost:3000/users';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class UsersService {
   private readonly http = inject(HttpClient);
 
+  getById(id: number): Observable<User> {
+    return this.http.get<User>(`${USERS_API_URL}/${id}`);
+  }
+
   getByFilter(filter: { query: string; pageSize: number }): Observable<User[]> {
     return this.http.get<User[]>(USERS_API_URL, {
-      params: { q: filter.query, _limit: filter.pageSize },
+      params: {q: filter.query, _limit: filter.pageSize},
     });
+  }
+
+  create(user: Omit<User, 'id'>): Observable<User> {
+    return this.http.post<User>(USERS_API_URL, user);
+  }
+
+  update(user: User): Observable<User> {
+    return this.http.put<User>(`${USERS_API_URL}/${user.id}`, user);
   }
 }

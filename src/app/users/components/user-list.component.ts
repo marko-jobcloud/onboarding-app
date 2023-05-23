@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
   template: `
     <ul>
       <li *ngFor="let user of users">
-        <a routerLink="/users/edit/{{ user.id }}">{{
+        <a routerLink="/users/{{ user.id }}/edit">{{
           user.firstName + ' ' + user.lastName
         }}</a>
       </li>

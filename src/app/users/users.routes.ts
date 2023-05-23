@@ -1,6 +1,9 @@
 import { Route } from '@angular/router';
 import { provideState } from '@ngrx/store';
 import { usersFeature } from './users.state';
+import { provideEffects } from '@ngrx/effects';
+import * as usersRoutingEffects from './effects/users-routing.effects';
+import * as usersApiEffects from './effects/users-api.effects';
 
 const usersRoutes: Route[] = [
   {
@@ -14,8 +17,15 @@ const usersRoutes: Route[] = [
         path: ':id/edit',
         loadComponent: () => import('./containers/user-edit.component'),
       },
+      {
+        path: 'create',
+        loadComponent: () => import('./containers/user-create.component'),
+      },
     ],
-    providers: [provideState(usersFeature)],
+    providers: [
+      provideState(usersFeature),
+      provideEffects(usersApiEffects, usersRoutingEffects),
+    ],
   },
 ];
 
